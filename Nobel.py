@@ -32,10 +32,13 @@ x_dtm = vect.fit_transform(x)
 nb = DecisionTreeClassifier()
 nb.fit(x_dtm, y)
 
-df_dtm = vect.transform(df['Text'])
-prediction = nb.predict(df_dtm)
+#df_dtm = vect.transform(df['Text'])
+#prediction = nb.predict(df_dtm)
 
+classifier = DecisionTreeClassifier(max_depth=8, criterion='texto_limpio', min_samples_leaf=10, max_features=7, random_state=0)
+classifier.fit(x, y)
 
+prediction = classifier.predict(df)
 
 st.subheader('Predicción')
 if prediction == 0:
