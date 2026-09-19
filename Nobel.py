@@ -29,7 +29,7 @@ y = nobel.Label
 vect = CountVectorizer()
 x_dtm = vect.fit_transform(x)
 
-nb = MultinomialNB()
+nb = DecisionTreeClassifier()
 nb.fit(x_dtm, y)
 
 df_dtm = vect.transform(df['Text'])
