@@ -11,7 +11,7 @@ st.title("Nobel Prizes")
 st.image("no_2.jpg", caption="Nobel Prize symbol based on its creator, Alfred Nobel")
 
 st.header("Text Classification")
-st.write("0: Physics 1: Medicine2: Peace 3: Literature 4: Chemistry 5: Economics")
+st.write("0: Physics     1: Medicine    2: Peace     3: Literature     4: Chemistry     5: Economics")
 
 
 @st.cache_data
@@ -83,7 +83,7 @@ if st.button("Predict"):
         else:
             result = str(prediction)
 
-        st.subheader("Prediction")
+        st.subheader("Classification")
         st.success(result)
 
 
