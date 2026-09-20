@@ -20,20 +20,12 @@ nobel = load_data()
 
 columnas = {"Text", "Label"}
 
-#if not columnas.issubset(nobel.columns):
-    #st.error("The file must contain the columns 'Text' and 'Label'.")
-   # st.stop()
-
-# Remove rows with missing values
-#nobel = nobel.dropna(subset=["Text", "Label"])
-
 x = nobel["Text"].astype(str)
 y = nobel["Label"]
 
-# Split the data
+
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=42, stratify=y)
 
-# Convert text into numerical vectors
 vectorizer = TfidfVectorizer(lowercase=True, stop_words=None)
 
 x_train_vec = vectorizer.fit_transform(x_train)
@@ -59,8 +51,8 @@ best_k = max(results, key=results.get)
 final_model = KNeighborsClassifier(n_neighbors=best_k)
 final_model.fit(x_train_vec, y_train)
 
-st.write(f"Best K value: {best_k}")
-st.write(f"Model accuracy: {results[best_k]:.2%}")
+#st.write(f"Best K value: {best_k}")
+#st.write(f"Model accuracy: {results[best_k]:.2%}")
 
 # User input
 user_text = st.text_input("Enter the text you want to evaluate:")
@@ -72,13 +64,29 @@ if st.button("Predict"):
         user_text_vectorized = vectorizer.transform([user_text])
         prediction = final_model.predict(user_text_vectorized)[0]
 
-        prize_categories = {
-            0: "Physics",
-            1: "Medicine",
-            2: "Peace",
-            3: "Literature",
-            4: "Chemistry",
-            5: "Economics"
+        #prize_categories = {
+            #0: "Physics",
+            #1: "Medicine",
+            #2: "Peace",
+            #3: "Literature",
+            #4: "Chemistry",
+            #5: "Economics"
+
+             prediction == 0:
+              st.write('Physics')
+            elif prediction == 1:
+              st.write('Medicine')
+            elif prediction == 2:
+              st.write('Peace')
+            elif prediction == 3:
+              st.write('Literature')
+            elif prediction == 4:
+              st.write('Chemistry')
+            elif prediction == 5:
+              st.write('Economics')
+            else:
+              st.write('Sin Predicción')
+
         }
 
         # If labels are numeric, use the dictionary.
