@@ -64,31 +64,17 @@ if st.button("Predict"):
         user_text_vectorized = vectorizer.transform([user_text])
         prediction = final_model.predict(user_text_vectorized)[0]
 
-        #prize_categories = {
-            #0: "Physics",
-            #1: "Medicine",
-            #2: "Peace",
-            #3: "Literature",
-            #4: "Chemistry",
-            #5: "Economics"
-
-             prediction == 0:
-              st.write('Physics')
-            elif prediction == 1:
-              st.write('Medicine')
-            elif prediction == 2:
-              st.write('Peace')
-            elif prediction == 3:
-              st.write('Literature')
-            elif prediction == 4:
-              st.write('Chemistry')
-            elif prediction == 5:
-              st.write('Economics')
-            else:
-              st.write('Sin Predicción')
+        prize_categories = {
+            0: "Physics",
+            1: "Medicine",
+            2: "Peace",
+            3: "Literature",
+            4: "Chemistry",
+            5: "Economics"
 
         }
 
+    
         # If labels are numeric, use the dictionary.
         # If labels are already text, display them directly.
         if isinstance(prediction, (int, float)):
