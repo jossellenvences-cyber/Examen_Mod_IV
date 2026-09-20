@@ -11,6 +11,13 @@ st.title("Nobel Prizes")
 st.image("no_2.jpg", caption="Nobel Prize symbol based on its creator, Alfred Nobel")
 
 st.header("Text Classification")
+st.write("  0: "Physics",
+            1: "Medicine",
+            2: "Peace",
+            3: "Literature",
+            4: "Chemistry",
+            5: "Economics"
+        )
 
 @st.cache_data
 def load_data():
@@ -31,7 +38,6 @@ vectorizer = TfidfVectorizer(lowercase=True, stop_words=None)
 x_train_vec = vectorizer.fit_transform(x_train)
 x_test_vec = vectorizer.transform(x_test)
 
-# Test different K values
 results = {}
 
 max_k = min(5, len(x_train))
@@ -45,16 +51,13 @@ for k in range(1, max_k + 1):
 
     results[k] = accuracy
 
-# Select the best K value
+
 best_k = max(results, key=results.get)
 
 final_model = KNeighborsClassifier(n_neighbors=best_k)
 final_model.fit(x_train_vec, y_train)
 
-#st.write(f"Best K value: {best_k}")
-#st.write(f"Model accuracy: {results[best_k]:.2%}")
 
-# User input
 user_text = st.text_input("Enter the text you want to evaluate:")
 
 if st.button("Predict"):
