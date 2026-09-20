@@ -11,11 +11,11 @@ st.title("Nobel Prizes")
 st.image("no_2.jpg", caption="Nobel Prize symbol based on its creator, Alfred Nobel")
 
 st.header("Text Classification")
-st.write("  0: "Physics",
-            1: "Medicine",
-            2: "Peace",
-            3: "Literature",
-            4: "Chemistry",
+st.write("  0: "Physics"
+            1: "Medicine"
+            2: "Peace"
+            3: "Literature"
+            4: "Chemistry"
             5: "Economics"
         )
 
