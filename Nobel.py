@@ -31,13 +31,13 @@ columnas = {"Text", "Label"}
 #y = nobel["Label"]
 
 # Split the data
-x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=42, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=42, stratify=y)
 
 # Convert text into numerical vectors
 vectorizer = TfidfVectorizer(lowercase=True, stop_words=None)
 
-x_train_vec = vectorizer.fit_transform(X_train)
-x_test_vec = vectorizer.transform(X_test)
+x_train_vec = vectorizer.fit_transform(x_train)
+x_test_vec = vectorizer.transform(x_test)
 
 # Test different K values
 results = {}
