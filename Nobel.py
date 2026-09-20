@@ -27,8 +27,8 @@ columnas = {"Text", "Label"}
 # Remove rows with missing values
 #nobel = nobel.dropna(subset=["Text", "Label"])
 
-#X = nobel["Text"].astype(str)
-#y = nobel["Label"]
+x = nobel["Text"].astype(str)
+y = nobel["Label"]
 
 # Split the data
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=42, stratify=y)
