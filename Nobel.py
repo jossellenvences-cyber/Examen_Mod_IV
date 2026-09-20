@@ -31,13 +31,13 @@ columnas = {"Text", "Label"}
 #y = nobel["Label"]
 
 # Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=42, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=42, stratify=y)
 
 # Convert text into numerical vectors
 vectorizer = TfidfVectorizer(lowercase=True, stop_words=None)
 
-X_train_vec = vectorizer.fit_transform(X_train)
-X_test_vec = vectorizer.transform(X_test)
+x_train_vec = vectorizer.fit_transform(X_train)
+x_test_vec = vectorizer.transform(X_test)
 
 # Test different K values
 results = {}
@@ -46,9 +46,9 @@ max_k = min(5, len(X_train))
 
 for k in range(1, max_k + 1):
     model = KNeighborsClassifier(n_neighbors=k)
-    model.fit(X_train_vec, y_train)
+    model.fit(x_train_vec, y_train)
 
-    predictions = model.predict(X_test_vec)
+    predictions = model.predict(x_test_vec)
     accuracy = accuracy_score(y_test, predictions)
 
     results[k] = accuracy
@@ -57,7 +57,7 @@ for k in range(1, max_k + 1):
 best_k = max(results, key=results.get)
 
 final_model = KNeighborsClassifier(n_neighbors=best_k)
-final_model.fit(X_train_vec, y_train)
+final_model.fit(x_train_vec, y_train)
 
 st.write(f"Best K value: {best_k}")
 st.write(f"Model accuracy: {results[best_k]:.2%}")
