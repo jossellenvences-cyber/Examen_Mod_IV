@@ -30,6 +30,8 @@ y = nobel.Label
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=42)
 
+k_list = range(1,6,1)
+
 for k in k_list:
     knn = KNeighborsClassifier(n_neighbors=k)
     modelo_knn = knn.fit(x_train, y_train)
