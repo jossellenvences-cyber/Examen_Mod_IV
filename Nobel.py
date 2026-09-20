@@ -1,72 +1,110 @@
-import numpy as np
 import streamlit as st
 import pandas as pd
-from sklearn import datasets
-from sklearn.neighbors import KNeighborsClassifier
+
 from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
 
+st.title("Premios Nobel")
 
+st.image(
+    "no_2.jpg",
+    caption="Símbolo de los Premios Nobel basado en su creador, Alfred Nobel"
+)
 
-st.write(''' # Premios Nobel ''')
-st.image("no_2.jpg", caption="Simbolo de Premios Nobel en base a su creador Alfred Nobel")
+st.header("Clasificación de texto")
 
-st.header('Texto')
+# Cargar datos
+@st.cache_data
+def cargar_datos():
+    return pd.read_csv("df_nobel_final.csv", encoding="latin-1")
 
-def user_input_features():
-  # Entrada
-  texto_limpio = st.text_input("Introduce el texto a evaluar")
+nobel = cargar_datos()
 
-  user_input_data = {'Text': texto_limpio}
+# Validar columnas necesarias
+columnas_requeridas = {"Text", "Label"}
 
-  features = pd.DataFrame(user_input_data, index=[0])
+if not columnas_requeridas.issubset(nobel.columns):
+    st.error("El archivo debe contener las columnas 'Text' y 'Label'.")
+    st.stop()
 
-  return features
+# Eliminar datos vacíos
+nobel = nobel.dropna(subset=["Text", "Label"])
 
-df_nob = user_input_features()
+X = nobel["Text"].astype(str)
+y = nobel["Label"]
 
-nobel =  pd.read_csv('df_nobel_final.csv', encoding='latin-1')
-x = nobel.Text
-y = nobel.Label
+# Separar datos
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.30,
+    random_state=42,
+    stratify=y
+)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=42)
+# Convertir texto a valores numéricos
+vectorizador = TfidfVectorizer(
+    lowercase=True,
+    stop_words=None
+)
 
-k_list = range(1,6,1)
+X_train_vectorizado = vectorizador.fit_transform(X_train)
+X_test_vectorizado = vectorizador.transform(X_test)
 
-for k in k_list:
-    knn = KNeighborsClassifier(n_neighbors=k)
-    modelo_knn = knn.fit(x_train, y_train)
+# Probar diferentes valores de K
+resultados = {}
 
-    y_pred = modelo_knn.predict(x_test)
-  
+max_k = min(5, len(X_train))
 
-    mse = mean_squared_error(y_test, y_pred)
-    
-    knn_dict[k] = mse
-    
+for k in range(1, max_k + 1):
+    modelo = KNeighborsClassifier(n_neighbors=k)
+    modelo.fit(X_train_vectorizado, y_train)
 
-#vect = CountVectorizer()
-#x_dtm = vect.fit_transform(x)
+    predicciones = modelo.predict(X_test_vectorizado)
+    accuracy = accuracy_score(y_test, predicciones)
 
-#nb = MultinomialNB()
-#nb.fit(x_dtm, y)
+    resultados[k] = accuracy
 
-#df_dtm = vect.transform(df['Text'])
+# Elegir el mejor valor de K
+mejor_k = max(resultados, key=resultados.get)
 
-#prediction = nb.predict(df_dtm)
+modelo_final = KNeighborsClassifier(n_neighbors=mejor_k)
+modelo_final.fit(X_train_vectorizado, y_train)
 
+st.write(f"Mejor valor de K: {mejor_k}")
+st.write(f"Exactitud del modelo: {resultados[mejor_k]:.2%}")
 
-st.subheader('Predicción')
-if y_pred == 0:
-  st.write('Physics')
-elif y_pred == 1:
-  st.write('Medicine')
-elif y_pred == 2:
-  st.write('Peace')
-elif y_pred == 3:
-  st.write('Literature')
-elif y_pred == 4:
-  st.write('Chemistry')
-elif y_pred == 5:
-  st.write('Economics')
-else:
-  st.write('Sin Predicción')
+# Entrada del usuario
+texto_usuario = st.text_input("Introduce el texto que deseas evaluar:")
+
+if st.button("Predecir"):
+    if texto_usuario.strip() == "":
+        st.warning("Introduce un texto antes de realizar la predicción.")
+    else:
+        texto_vectorizado = vectorizador.transform([texto_usuario])
+        prediccion = modelo_final.predict(texto_vectorizado)[0]
+
+        nombres_premios = {
+            0: "Physics",
+            1: "Medicine",
+            2: "Peace",
+            3: "Literature",
+            4: "Chemistry",
+            5: "Economics"
+        }
+
+        # Si Label es numérico, usa el diccionario.
+        # Si ya contiene texto, muestra directamente la etiqueta.
+        if isinstance(prediccion, (int, float)):
+            resultado = nombres_premios.get(
+                int(prediccion),
+                "Categoría desconocida"
+            )
+        else:
+            resultado = str(prediccion)
+
+        st.subheader("Predicción")
+        st.success(resultado)
+
