@@ -42,7 +42,7 @@ x_test_vec = vectorizer.transform(x_test)
 # Test different K values
 results = {}
 
-max_k = min(5, len(X_train))
+max_k = min(5, len(x_train))
 
 for k in range(1, max_k + 1):
     model = KNeighborsClassifier(n_neighbors=k)
