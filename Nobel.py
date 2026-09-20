@@ -6,87 +6,73 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 
-st.title("Premios Nobel")
+st.title("Nobel Prizes")
 
-st.image(
-    "no_2.jpg",
-    caption="Símbolo de los Premios Nobel basado en su creador, Alfred Nobel"
-)
+st.image("no_2.jpg", caption="Nobel Prize symbol based on its creator, Alfred Nobel")
 
-st.header("Clasificación de texto")
+st.header("Text Classification")
 
-# Cargar datos
 @st.cache_data
-def cargar_datos():
+def load_data():
     return pd.read_csv("df_nobel_final.csv", encoding="latin-1")
 
-nobel = cargar_datos()
+nobel = load_data()
 
-# Validar columnas necesarias
-columnas_requeridas = {"Text", "Label"}
+columnas = {"Text", "Label"}
 
-if not columnas_requeridas.issubset(nobel.columns):
-    st.error("El archivo debe contener las columnas 'Text' y 'Label'.")
-    st.stop()
+#if not columnas.issubset(nobel.columns):
+    #st.error("The file must contain the columns 'Text' and 'Label'.")
+   # st.stop()
 
-# Eliminar datos vacíos
-nobel = nobel.dropna(subset=["Text", "Label"])
+# Remove rows with missing values
+#nobel = nobel.dropna(subset=["Text", "Label"])
 
-X = nobel["Text"].astype(str)
-y = nobel["Label"]
+#X = nobel["Text"].astype(str)
+#y = nobel["Label"]
 
-# Separar datos
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.30,
-    random_state=42,
-    stratify=y
-)
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=42, stratify=y)
 
-# Convertir texto a valores numéricos
-vectorizador = TfidfVectorizer(
-    lowercase=True,
-    stop_words=None
-)
+# Convert text into numerical vectors
+vectorizer = TfidfVectorizer(lowercase=True, stop_words=None)
 
-X_train_vectorizado = vectorizador.fit_transform(X_train)
-X_test_vectorizado = vectorizador.transform(X_test)
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
 
-# Probar diferentes valores de K
-resultados = {}
+# Test different K values
+results = {}
 
 max_k = min(5, len(X_train))
 
 for k in range(1, max_k + 1):
-    modelo = KNeighborsClassifier(n_neighbors=k)
-    modelo.fit(X_train_vectorizado, y_train)
+    model = KNeighborsClassifier(n_neighbors=k)
+    model.fit(X_train_vec, y_train)
 
-    predicciones = modelo.predict(X_test_vectorizado)
-    accuracy = accuracy_score(y_test, predicciones)
+    predictions = model.predict(X_test_vec)
+    accuracy = accuracy_score(y_test, predictions)
 
-    resultados[k] = accuracy
+    results[k] = accuracy
 
-# Elegir el mejor valor de K
-mejor_k = max(resultados, key=resultados.get)
+# Select the best K value
+best_k = max(results, key=results.get)
 
-modelo_final = KNeighborsClassifier(n_neighbors=mejor_k)
-modelo_final.fit(X_train_vectorizado, y_train)
+final_model = KNeighborsClassifier(n_neighbors=best_k)
+final_model.fit(X_train_vec, y_train)
 
-st.write(f"Mejor valor de K: {mejor_k}")
-st.write(f"Exactitud del modelo: {resultados[mejor_k]:.2%}")
+st.write(f"Best K value: {best_k}")
+st.write(f"Model accuracy: {results[best_k]:.2%}")
 
-# Entrada del usuario
-texto_usuario = st.text_input("Introduce el texto que deseas evaluar:")
+# User input
+user_text = st.text_input("Enter the text you want to evaluate:")
 
-if st.button("Predecir"):
-    if texto_usuario.strip() == "":
-        st.warning("Introduce un texto antes de realizar la predicción.")
+if st.button("Predict"):
+    if user_text.strip() == "":
+        st.warning("Please enter some text before making a prediction.")
     else:
-        texto_vectorizado = vectorizador.transform([texto_usuario])
-        prediccion = modelo_final.predict(texto_vectorizado)[0]
+        user_text_vectorized = vectorizer.transform([user_text])
+        prediction = final_model.predict(user_text_vectorized)[0]
 
-        nombres_premios = {
+        prize_categories = {
             0: "Physics",
             1: "Medicine",
             2: "Peace",
@@ -95,16 +81,20 @@ if st.button("Predecir"):
             5: "Economics"
         }
 
-        # Si Label es numérico, usa el diccionario.
-        # Si ya contiene texto, muestra directamente la etiqueta.
-        if isinstance(prediccion, (int, float)):
-            resultado = nombres_premios.get(
-                int(prediccion),
-                "Categoría desconocida"
+        # If labels are numeric, use the dictionary.
+        # If labels are already text, display them directly.
+        if isinstance(prediction, (int, float)):
+            result = prize_categories.get(
+                int(prediction),
+                "Unknown category"
             )
         else:
-            resultado = str(prediccion)
+            result = str(prediction)
 
-        st.subheader("Predicción")
-        st.success(resultado)
+        st.subheader("Prediction")
+        st.success(result)
 
+
+
+
+        
